@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:18.4
+    restart: always
+    ports:
+    - "5432:5432"
+    environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=pass
+    - POSTGRES_DB=chordanalyzr
+
+  flyway:
+    image: flyway/flyway:11
+    command: -configFiles=/flyway/conf/flyway.config -locations=filesystem:/flyway/sql -connectRetries=60 migrate
+    volumes:
+      - ./flyway/sql:/flyway/sql
+      - ./flyway/flyway.conf:/flyway/conf/flyway.config
+    depends_on:
+      - postgres
+
+  # Optional: writes JSON exports of the views to ./output, then exits.
+  # Run with: docker compose --profile export up data-generator
+  data-generator:
+    profiles: ["export"]
+    build:
+      context: ./data-generator
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=chordanalyzr
+      - DB_USER=postgres
+      - DB_PASSWORD=pass
+      - OUTPUT_DIR=/output
+    volumes:
+      - ./output:/output
+    depends_on:
+      - flyway
+    restart: "no"
