@@ -1,5 +1,5 @@
 -- Regression tests for the voice-leading functions in
--- flyway/sql/views/R__voice_leading.sql. Design notes: docs/voice-leading-design.md
+-- flyway/sql/views/R__voice_leading.sql. Design notes: local/docs/voice-leading-design.md
 --
 -- Run against a migrated database:
 --
